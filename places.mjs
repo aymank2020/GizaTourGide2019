@@ -1,6 +1,8 @@
+export const contentVersion = "2026-10-02.1";
 export const places = [
   {
     id: "giza",
+    reviewedAt: "2026-10-02",
     ar: "أهرامات الجيزة",
     en: "Giza Pyramids",
     areaAr: "الجيزة",
@@ -12,6 +14,7 @@ export const places = [
   },
   {
     id: "saqqara",
+    reviewedAt: "2026-10-02",
     ar: "سقارة",
     en: "Saqqara",
     areaAr: "جنوب الجيزة",
@@ -23,6 +26,7 @@ export const places = [
   },
   {
     id: "dahshur",
+    reviewedAt: "2026-10-02",
     ar: "دهشور",
     en: "Dahshur",
     areaAr: "جنوب الجيزة",
@@ -33,6 +37,7 @@ export const places = [
   },
   {
     id: "gem",
+    reviewedAt: "2026-10-02",
     ar: "المتحف المصري الكبير",
     en: "Grand Egyptian Museum",
     areaAr: "الجيزة",

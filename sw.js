@@ -1,6 +1,6 @@
 // Bump this version whenever an app-shell file changes. Installation is atomic:
 // a failed download leaves the previous active worker and its cache available.
-const VERSION = "2026-10-02-1";
+const VERSION = "2026-10-02-2";
 const scope = new URL(self.registration.scope);
 const prefix = `giza-guide:${scope.pathname}:`;
 const cacheName = `${prefix}${VERSION}`;

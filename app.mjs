@@ -1,4 +1,9 @@
-import { places, filterPlaces, parseFavorites } from "./places.mjs";
+import {
+  places,
+  contentVersion,
+  filterPlaces,
+  parseFavorites,
+} from "./places.mjs";
 import { setupOffline } from "./offline.mjs";
 const key = "giza-guide-favorites-v1";
 const status = document.querySelector("#status");
@@ -22,6 +27,8 @@ const labels = {
     notice: "راجع المصدر الرسمي قبل الزيارة لمعرفة المواعيد والتذاكر الحالية.",
     favorites: "قائمة الزيارة فقط",
     source: "المصدر الرسمي",
+    reviewed: "راجعت روابط المصدر في:",
+    contentVersion: "نسخة المحتوى:",
     add: "أضف إلى الزيارة",
     remove: "أزل من الزيارة",
     empty: "لا توجد أماكن تطابق البحث.",
@@ -47,6 +54,8 @@ const labels = {
       "Check the official source before visiting for current hours and tickets.",
     favorites: "Visit list only",
     source: "Official source",
+    reviewed: "Source links reviewed on:",
+    contentVersion: "Content version:",
     add: "Add to visit list",
     remove: "Remove from visit list",
     empty: "No places match these filters.",
@@ -74,6 +83,8 @@ function el(tag, text) {
 function render() {
   const copy = labels[language];
   renderOffline();
+  document.querySelector("#content-version").textContent =
+    `${copy.contentVersion} ${contentVersion}`;
   document.documentElement.lang = language;
   document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
   document.title = copy.title;
@@ -110,6 +121,19 @@ function render() {
     link.target = "_blank";
     link.rel = "noopener noreferrer";
     card.append(link);
+    const reviewed = el("p", `${copy.reviewed} `);
+    const date = el(
+      "time",
+      new Intl.DateTimeFormat(language === "ar" ? "ar-EG" : "en-GB", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        timeZone: "UTC",
+      }).format(new Date(`${place.reviewedAt}T00:00:00Z`)),
+    );
+    date.dateTime = place.reviewedAt;
+    reviewed.append(date);
+    card.append(reviewed);
     const button = el(
       "button",
       favorites.has(place.id) ? copy.remove : copy.add,

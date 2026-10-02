@@ -1,11 +1,21 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { places, filterPlaces, parseFavorites } from "../places.mjs";
+import {
+  places,
+  contentVersion,
+  filterPlaces,
+  parseFavorites,
+} from "../places.mjs";
 test("all places have distinct bilingual labels and official https sources", () => {
   assert.equal(places.length, 4);
+  assert.match(contentVersion, /^\d{4}-\d{2}-\d{2}\.\d+$/);
   assert.equal(new Set(places.map((x) => x.id)).size, 4);
   for (const place of places) {
     assert.ok(place.ar && place.en && place.arSummary && place.enSummary);
+    assert.equal(
+      new Date(place.reviewedAt).toISOString().slice(0, 10),
+      place.reviewedAt,
+    );
     assert.match(
       place.source,
       /^https:\/\/(egymonuments.gov.eg|www.experienceegypt.eg)\//,

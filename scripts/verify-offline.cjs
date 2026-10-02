@@ -48,6 +48,8 @@ async function ready(page) {
   await page.goto(url);
   await ready(page);
   assert.equal(await page.locator('#results article').count(), 4);
+  assert.equal(await page.locator('#results time[datetime="2026-10-02"]').count(), 4);
+  assert.match(await page.locator('#content-version').innerText(), /2026-10-02\.1/);
   const initialCache = await page.evaluate(async () => {
     const names = await caches.keys();
     const name = names.find(x => x.startsWith('giza-guide:'));
@@ -77,6 +79,8 @@ async function ready(page) {
   assert.equal(await page.locator('#results article').count(), 1);
   assert.equal(await page.locator('html').getAttribute('dir'), 'ltr');
   assert.match(await page.locator('#offline-status').innerText(), /You are offline/);
+  assert.match(await page.locator('#results article').first().innerText(), /Source links reviewed on/);
+  assert.match(await page.locator('#content-version').innerText(), /Content version/);
   await page.locator('#query').fill('');
   await page.locator('#favorites').check();
   assert.equal(await page.locator('#results article').count(), 1);
