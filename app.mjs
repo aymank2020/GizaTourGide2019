@@ -1,10 +1,13 @@
 import { places, filterPlaces, parseFavorites } from "./places.mjs";
+import { setupOffline } from "./offline.mjs";
 const key = "giza-guide-favorites-v1";
 const status = document.querySelector("#status");
 const results = document.querySelector("#results");
 let language = "ar";
 let favorites = new Set();
 let storageReadFailed = false;
+let offlineState = { state: "preparing", online: navigator.onLine !== false };
+let applyUpdate = null;
 try {
   const saved = localStorage.getItem(key);
   if (saved) favorites = parseFavorites(saved);
@@ -24,6 +27,15 @@ const labels = {
     empty: "لا توجد أماكن تطابق البحث.",
     saved: "حُفظت قائمة الزيارة.",
     unsaved: "تعذر الحفظ؛ التغيير لهذه الجلسة فقط.",
+    offlineReady:
+      "الدليل محفوظ للفتح دون اتصال. روابط المصادر الرسمية تحتاج الإنترنت.",
+    offlineActive:
+      "أنت دون اتصال؛ الدليل وقائمة الزيارة يعملان محليًا. روابط المصادر تحتاج الإنترنت.",
+    offlinePreparing: "يجري حفظ الدليل للفتح دون اتصال…",
+    offlineUnavailable: "تعذر حفظ الدليل للفتح دون اتصال في هذا المتصفح.",
+    offlineFirstVisit:
+      "لم تُحفظ نسخة دون اتصال بعد؛ افتح الدليل مرة وأنت متصل.",
+    update: "تحديث النسخة المحفوظة",
     footer:
       "المحتوى موجز بالعربية والإنجليزية، روجعت روابطه في 2 أكتوبر 2026. لا يتضمن مواعيد أو أسعارًا مفترضة. قائمة الزيارة تبقى على هذا المتصفح.",
   },
@@ -40,6 +52,16 @@ const labels = {
     empty: "No places match these filters.",
     saved: "Visit list saved.",
     unsaved: "Saving failed; this change lasts for this session only.",
+    offlineReady:
+      "Guide saved for offline use. Official source links need the internet.",
+    offlineActive:
+      "You are offline; the guide and visit list work locally. Source links need the internet.",
+    offlinePreparing: "Saving the guide for offline use…",
+    offlineUnavailable:
+      "This browser could not save the guide for offline use.",
+    offlineFirstVisit:
+      "No offline copy yet; open the guide once while connected.",
+    update: "Update saved guide",
     footer:
       "Short Arabic and English descriptions; links reviewed on 2 October 2026. No assumed opening times or prices. Your visit list stays in this browser.",
   },
@@ -51,6 +73,7 @@ function el(tag, text) {
 }
 function render() {
   const copy = labels[language];
+  renderOffline();
   document.documentElement.lang = language;
   document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
   document.title = copy.title;
@@ -116,6 +139,23 @@ function render() {
     results.append(card);
   }
 }
+function renderOffline() {
+  const copy = labels[language];
+  const message =
+    offlineState.state === "ready"
+      ? offlineState.online
+        ? copy.offlineReady
+        : copy.offlineActive
+      : !offlineState.online
+        ? copy.offlineFirstVisit
+        : offlineState.state === "unavailable"
+          ? copy.offlineUnavailable
+          : copy.offlinePreparing;
+  document.querySelector("#offline-status").textContent = message;
+  const update = document.querySelector("#offline-update");
+  update.hidden = !applyUpdate;
+  update.textContent = copy.update;
+}
 document.querySelector("#language").addEventListener("click", () => {
   language = language === "ar" ? "en" : "ar";
   status.textContent = "";
@@ -126,3 +166,16 @@ document.querySelector("#language").addEventListener("click", () => {
 for (const id of ["query", "favorites"])
   document.querySelector(`#${id}`).addEventListener("input", render);
 render();
+document
+  .querySelector("#offline-update")
+  .addEventListener("click", () => applyUpdate?.());
+setupOffline({
+  onChange: (value) => {
+    offlineState = value;
+    renderOffline();
+  },
+  onUpdate: (value) => {
+    applyUpdate = value;
+    renderOffline();
+  },
+});
