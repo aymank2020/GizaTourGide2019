@@ -1,1 +1,10 @@
-{"name":"giza-local-guide","version":"0.1.0","private":true,"type":"module","scripts":{"test":"node --test test/*.test.mjs"}}
+{
+  "name": "giza-local-guide",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "test:browser": "node scripts/verify-offline.cjs"
+  }
+}
